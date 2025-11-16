@@ -1,0 +1,21 @@
+# Git files
+.git
+.gitignore
+
+# Examples (users can see them on GitHub)
+examples/
+
+# IDE files
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
