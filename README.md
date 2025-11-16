@@ -40,7 +40,7 @@ cordova plugin add cordova-plugin-alpha-obd2
 Or install from GitHub:
 
 ```bash
-cordova plugin add https://github.com/Maximusr-1975/Alpha_ODB2.git
+cordova plugin add https://github.com/Maximusr-1975/Alpha_ODB2.git#claude/cordova-obd2-plugin-01PAVHtijo1R8MHe5AaMg8pU
 ```
 
 ### Alphanywhere
