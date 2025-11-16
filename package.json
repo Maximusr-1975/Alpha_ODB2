@@ -1,7 +1,8 @@
 {
-  "name": "cordova-plugin-obd2",
+  "name": "cordova-plugin-alpha-obd2",
   "version": "1.0.0",
   "description": "Comprehensive Cordova plugin for OBD2 car diagnostics with Alphanywhere support",
+  "main": "www/obd2.js",
   "cordova": {
     "id": "cordova-plugin-obd2",
     "platforms": [
