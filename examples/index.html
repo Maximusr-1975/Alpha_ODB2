@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OBD2 Plugin Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .data-display {
+            background: white;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-family: monospace;
+        }
+        .status {
+            padding: 8px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .status.connected {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        select {
+            width: 100%;
+            padding: 8px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>OBD2 Diagnostics</h1>
+
+        <!-- Connection Section -->
+        <div class="section">
+            <h2>Connection</h2>
+            <div id="status" class="status disconnected">Disconnected</div>
+            <button onclick="scanDevices()">Scan Devices</button>
+            <select id="deviceList">
+                <option value="">Select a device...</option>
+            </select>
+            <button onclick="connect()">Connect</button>
+            <button onclick="disconnect()">Disconnect</button>
+            <button onclick="initialize()">Initialize</button>
+        </div>
+
+        <!-- Real-time Data Section -->
+        <div class="section">
+            <h2>Real-time Data</h2>
+            <button onclick="getRPM()">Get RPM</button>
+            <button onclick="getSpeed()">Get Speed</button>
+            <button onclick="getCoolantTemp()">Get Coolant Temp</button>
+            <button onclick="getEngineLoad()">Get Engine Load</button>
+            <button onclick="getSnapshot()">Get Snapshot</button>
+            <div id="realtimeData" class="data-display">No data yet...</div>
+        </div>
+
+        <!-- Monitoring Section -->
+        <div class="section">
+            <h2>Real-time Monitoring</h2>
+            <button onclick="startMonitoring()">Start Monitoring</button>
+            <button onclick="stopMonitoring()">Stop Monitoring</button>
+            <div id="monitoringData" class="data-display">Monitoring not started...</div>
+        </div>
+
+        <!-- DTC Section -->
+        <div class="section">
+            <h2>Diagnostic Trouble Codes</h2>
+            <button onclick="getDTCs()">Get DTCs</button>
+            <button onclick="clearDTCs()">Clear DTCs</button>
+            <div id="dtcData" class="data-display">No DTCs...</div>
+        </div>
+
+        <!-- Vehicle Info Section -->
+        <div class="section">
+            <h2>Vehicle Information</h2>
+            <button onclick="getVIN()">Get VIN</button>
+            <button onclick="getSupportedPIDs()">Get Supported PIDs</button>
+            <div id="vehicleInfo" class="data-display">No vehicle info...</div>
+        </div>
+    </div>
+
+    <script>
+        // Connection Functions
+        function scanDevices() {
+            OBD2.scanDevices(
+                function(devices) {
+                    console.log('Devices found:', devices);
+                    const select = document.getElementById('deviceList');
+                    select.innerHTML = '<option value="">Select a device...</option>';
+                    devices.forEach(function(device) {
+                        const option = document.createElement('option');
+                        option.value = device.address;
+                        option.text = device.name + ' (' + device.address + ')';
+                        select.appendChild(option);
+                    });
+                    alert('Found ' + devices.length + ' device(s)');
+                },
+                function(error) {
+                    alert('Error scanning: ' + error);
+                }
+            );
+        }
+
+        function connect() {
+            const deviceAddress = document.getElementById('deviceList').value;
+            if (!deviceAddress) {
+                alert('Please select a device');
+                return;
+            }
+
+            OBD2.connect(deviceAddress,
+                function(success) {
+                    console.log('Connected:', success);
+                    document.getElementById('status').className = 'status connected';
+                    document.getElementById('status').textContent = 'Connected';
+                    alert('Connected successfully');
+                },
+                function(error) {
+                    alert('Connection error: ' + error);
+                }
+            );
+        }
+
+        function disconnect() {
+            OBD2.disconnect(
+                function(success) {
+                    console.log('Disconnected');
+                    document.getElementById('status').className = 'status disconnected';
+                    document.getElementById('status').textContent = 'Disconnected';
+                },
+                function(error) {
+                    alert('Disconnect error: ' + error);
+                }
+            );
+        }
+
+        function initialize() {
+            OBD2.initialize(
+                function(success) {
+                    alert('Initialized successfully');
+                },
+                function(error) {
+                    alert('Initialization error: ' + error);
+                }
+            );
+        }
+
+        // Real-time Data Functions
+        function getRPM() {
+            OBD2.getEngineRPM(
+                function(data) {
+                    displayData('realtimeData', 'Engine RPM: ' + data.rpm.toFixed(0) + ' RPM');
+                },
+                function(error) {
+                    alert('Error: ' + error);
+                }
+            );
+        }
+
+        function getSpeed() {
+            OBD2.getSpeed(
+                function(data) {
+                    displayData('realtimeData', 'Vehicle Speed: ' + data.speed.toFixed(0) + ' km/h');
+                },
+                function(error) {
+                    alert('Error: ' + error);
+                }
+            );
+        }
+
+        function getCoolantTemp() {
+            OBD2.getCoolantTemperature(
+                function(data) {
+                    displayData('realtimeData', 'Coolant Temperature: ' + data.temperature.toFixed(1) + ' °C');
+                },
+                function(error) {
+                    alert('Error: ' + error);
+                }
+            );
+        }
+
+        function getEngineLoad() {
+            OBD2.getEngineLoad(
+                function(data) {
+                    displayData('realtimeData', 'Engine Load: ' + data.load.toFixed(1) + ' %');
+                },
+                function(error) {
+                    alert('Error: ' + error);
+                }
+            );
+        }
+
+        function getSnapshot() {
+            OBD2.getVehicleSnapshot(
+                function(data) {
+                    const text =
+                        'RPM: ' + (data.rpm || 'N/A') + '\n' +
+                        'Speed: ' + (data.speed || 'N/A') + ' km/h\n' +
+                        'Coolant Temp: ' + (data.coolantTemp || 'N/A') + ' °C\n' +
+                        'Engine Load: ' + (data.engineLoad || 'N/A') + ' %\n' +
+                        'Throttle: ' + (data.throttle || 'N/A') + ' %\n' +
+                        'Fuel Level: ' + (data.fuelLevel || 'N/A') + ' %';
+                    displayData('realtimeData', text);
+                },
+                function(error) {
+                    alert('Error: ' + error);
+                }
+            );
+        }
+
+        // Monitoring Functions
+        let monitoringActive = false;
+
+        function startMonitoring() {
+            if (monitoringActive) return;
+
+            const pids = ['010C', '010D', '0105', '0104', '0111'];
+            const interval = 1000; // 1 second
+
+            OBD2.startMonitoring(pids, interval,
+                function(data) {
+                    monitoringActive = true;
+                    const text =
+                        'RPM: ' + (data['010C'] || 'N/A') + '\n' +
+                        'Speed: ' + (data['010D'] || 'N/A') + ' km/h\n' +
+                        'Coolant: ' + (data['0105'] || 'N/A') + ' °C\n' +
+                        'Load: ' + (data['0104'] || 'N/A') + ' %\n' +
+                        'Throttle: ' + (data['0111'] || 'N/A') + ' %';
+                    displayData('monitoringData', text);
+                },
+                function(error) {
+                    alert('Monitoring error: ' + error);
+                    monitoringActive = false;
+                }
+            );
+        }
+
+        function stopMonitoring() {
+            OBD2.stopMonitoring(
+                function(success) {
+                    monitoringActive = false;
+                    displayData('monitoringData', 'Monitoring stopped');
+                },
+                function(error) {
+                    alert('Error: ' + error);
+                }
+            );
+        }
+
+        // DTC Functions
+        function getDTCs() {
+            OBD2.getDTCs(
+                function(dtcs) {
+                    if (dtcs.length === 0) {
+                        displayData('dtcData', 'No DTCs found');
+                    } else {
+                        displayData('dtcData', 'DTCs:\n' + dtcs.join('\n'));
+                    }
+                },
+                function(error) {
+                    alert('Error: ' + error);
+                }
+            );
+        }
+
+        function clearDTCs() {
+            if (!confirm('Are you sure you want to clear all DTCs?')) return;
+
+            OBD2.clearDTCs(
+                function(success) {
+                    alert('DTCs cleared successfully');
+                    displayData('dtcData', 'DTCs cleared');
+                },
+                function(error) {
+                    alert('Error: ' + error);
+                }
+            );
+        }
+
+        // Vehicle Info Functions
+        function getVIN() {
+            OBD2.getVIN(
+                function(data) {
+                    displayData('vehicleInfo', 'VIN: ' + data.vin);
+                },
+                function(error) {
+                    alert('Error: ' + error);
+                }
+            );
+        }
+
+        function getSupportedPIDs() {
+            OBD2.getSupportedPIDs(
+                function(pids) {
+                    displayData('vehicleInfo', 'Supported PIDs (' + pids.length + '):\n' + pids.join(', '));
+                },
+                function(error) {
+                    alert('Error: ' + error);
+                }
+            );
+        }
+
+        // Helper Functions
+        function displayData(elementId, text) {
+            document.getElementById(elementId).textContent = text;
+        }
+    </script>
+</body>
+</html>

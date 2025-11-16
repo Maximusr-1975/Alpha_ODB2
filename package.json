@@ -1,0 +1,35 @@
+{
+  "name": "cordova-plugin-obd2",
+  "version": "1.0.0",
+  "description": "Comprehensive Cordova plugin for OBD2 car diagnostics with Alphanywhere support",
+  "cordova": {
+    "id": "cordova-plugin-obd2",
+    "platforms": [
+      "android",
+      "ios"
+    ]
+  },
+  "keywords": [
+    "cordova",
+    "obd2",
+    "obdii",
+    "car",
+    "diagnostics",
+    "bluetooth",
+    "elm327",
+    "alphanywhere",
+    "ecosystem:cordova",
+    "cordova-android",
+    "cordova-ios"
+  ],
+  "author": "Alpha ODB2",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Maximusr-1975/Alpha_ODB2.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Maximusr-1975/Alpha_ODB2/issues"
+  },
+  "homepage": "https://github.com/Maximusr-1975/Alpha_ODB2#readme"
+}
