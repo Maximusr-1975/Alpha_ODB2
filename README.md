@@ -34,7 +34,7 @@ A comprehensive Cordova plugin for OBD2 (On-Board Diagnostics II) vehicle diagno
 ### Cordova
 
 ```bash
-cordova plugin add cordova-plugin-obd2
+cordova plugin add cordova-plugin-alpha-obd2
 ```
 
 Or install from GitHub:
