@@ -1,0 +1,7 @@
+{
+  "download_directory": "./google_photos",
+  "credentials_file": "credentials.json",
+  "organize_by_date": true,
+  "download_videos": true,
+  "download_photos": true
+}
